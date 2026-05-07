@@ -1,0 +1,110 @@
+Problem Statement 10 — MongoDB Aggregation & Indexing
+Setup: Create and populate collections
+
+db.Books.insertMany([
+ { book_id: 1, book_title: "DBMS", author_name: "Korth",
+publish_year: 2010 },
+
+ { book_id: 2, book_title: "OS", author_name: "Galvin",
+publish_year: 2018 },
+
+ { book_id: 3, book_title: "CN", author_name: "Tanenbaum",
+publish_year: 2016 },
+
+ { book_id: 4, book_title: "Algorithms", author_name: "Korth",
+publish_year: 2020 },
+
+ { book_id: 5, book_title: "Java Basics", author_name: "Gosling",
+publish_year: 2012 }
+])
+
+db.Products.insertMany([
+ { product_id: 1, name: "Laptop", price: 55000 },
+
+ { product_id: 2, name: "Mouse", price: 500 },
+
+ { product_id: 3, name: "Keyboard", price: 1200 },
+
+ { product_id: 4, name: "Monitor", price: 12000 }
+])
+
+ Q1. Create index on price field in Products
+
+db.Products.createIndex({ price: 1 })
+
+Q2. Create compound index on author_name and publish_year in Books
+
+db.Books.createIndex({ author_name: 1, publish_year: 1 })
+
+Q3. View all indexes in Books and Products
+
+db.Books.getIndexes()
+db.Products.getIndexes()
+
+Q4. Drop the price index from ProductsQ5. Total number of books published by each author
+
+db.Products.dropIndex({ price: 1 })
+
+Q5. Total number of books published by each author
+
+db.Books.aggregate([
+ {
+   $group: {
+     _id: "$author_name",
+     total_books: { $sum: 1 }
+   }
+ }
+])
+
+Q6. Average price of all products
+
+db.Products.aggregate([
+ {
+   $group: {
+     _id: null,
+     average_price: { $avg: "$price" }
+   }
+ }
+])
+
+Q7. Maximum and minimum price in Products
+
+db.Products.aggregate([
+ {
+   $group: {
+     _id: null,
+     max_price: { $max: "$price" },
+     min_price: { $min: "$price" }
+   }
+ }
+])
+
+Q8. Count books published after 2015
+
+db.Books.aggregate([
+ {
+   $match: {
+     publish_year: { $gt: 2015 }
+   }
+ },
+ {
+   $count: "books_after_2015"
+ }
+])
+
+Q9. Display only book_title and author_name using $project
+
+db.Books.aggregate([
+ {
+   $project: {
+     _id: 0,
+     book_title: 1,
+     author_name: 1
+   }
+ }
+])
+
+Q10. Sorts documents based on one or more fields of Books Collection.
+
+db.Books.find().sort({ publish_year: -1 })
+db.Books.find().sort({ author_name: 1 })

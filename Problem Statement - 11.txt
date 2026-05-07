@@ -1,0 +1,151 @@
+Problem Statement: - 11
+Design and Implement 10 query using MongoDB
+
+use Restaurants
+db.createCollection("REST1")
+db.REST1.insertMany([
+ { restaurant_id: 3001, name: "Spice Garden",
+ address: { building: "12", street: "MG Road", city: "Mumbai", zipcode:
+"400001" },
+ cuisine_type: "Indian", score: 85 },
+ { restaurant_id: 3002, name: "Dragon Palace",
+ address: { building: "34", street: "Anna Salai", city: "Chennai", zipcode:
+"600002" },
+ cuisine_type: "Chinese", score: 92 },
+ { restaurant_id: 3003, name: "Pasta House",
+ address: { building: "56", street: "FC Road", city: "Pune", zipcode: "411004"
+},
+ cuisine_type: "Italian", score: 78 },
+ { restaurant_id: 3004, name: "Tandoor Express",
+ address: { building: "78", street: "Linking Rd", city: "Mumbai", zipcode:
+"400050" },
+ cuisine_type: "Indian", score: 88 },
+ { restaurant_id: 3005, name: "Burger Barn",
+ address: { building: "90", street: "Park St", city: "Kolkata", zipcode:
+"700016" },
+ cuisine_type: "American", score: 70 }
+])
+
+1.Create Database Restaurants.
+
+use Restaurants
+
+2.Create Collection REST1
+
+db.createCollection("REST1")
+
+ 3.Insert documents
+
+db.REST1.insertMany([
+{
+  restaurant_id: 3001,
+  name: "Spice Garden",
+  address: {
+    building: "12",
+    street: "MG Road",
+    city: "Mumbai",
+    zipcode: "400001"
+  },
+  cuisine_type: "Indian",
+  score: 85
+},
+{
+  restaurant_id: 3002,
+  name: "Dragon Palace",
+  address: {
+    building: "34",
+    street: "Anna Salai",
+    city: "Chennai",
+    zipcode: "600002"
+  },
+  cuisine_type: "Chinese",
+  score: 92
+},
+{
+  restaurant_id: 3003,
+  name: "Pasta House",
+  address: {
+    building: "56",
+    street: "FC Road",
+    city: "Pune",
+    zipcode: "411004"
+  },
+  cuisine_type: "Italian",
+  score: 78
+},
+{
+  restaurant_id: 3004,
+  name: "Tandoor Express",
+  address: {
+    building: "78",
+    street: "Linking Rd",
+    city: "Mumbai",
+    zipcode: "400050"
+  },
+  cuisine_type: "Indian",
+  score: 88
+},
+{
+  restaurant_id: 3005,
+  name: "Burger Barn",
+  address: {
+    building: "90",
+    street: "Park St",
+    city: "Kolkata",
+    zipcode: "700016"
+  },
+  cuisine_type: "American",
+  score: 70
+}
+])
+
+1. Write a MongoDB query to display all the documents in the collection restaurants
+
+db.REST1.find()
+
+2. Write a MongoDB query to display the fields restaurant_id, name, city,zipcode, but
+exclude the field _id for all the documents in the collection REST1
+
+db.REST1.find(
+  {},
+  {
+    _id: 0,
+    restaurant_id: 1,
+    name: 1,
+    "address.city": 1,
+    "address.zipcode": 1
+  }
+)
+
+3. Write a MongoDB query to find the restaurants that achieved a score, more than 80
+but less than 100
+
+db.REST1.find({
+  score: { $gt: 80, $lt: 100 }
+})
+
+4. Update the score of the restaurant with restaurant_id 3001 to 90
+
+db.REST1.updateOne(
+  { restaurant_id: 3001 },
+  { $set: { score: 90 } }
+)
+
+5. Update the cuisine type of all Indian restaurants to Indian_Zatka
+
+db.REST1.updateMany(
+  { cuisine_type: "Indian" },
+  { $set: { cuisine_type: "Indian_Zatka" } }
+)
+
+6. Delete the restaurant with restaurant_id 3003:
+
+db.REST1.deleteOne(
+  { restaurant_id: 3003 }
+)
+
+10. Delete all restaurants with a score less than 85
+
+db.REST1.deleteMany(
+  { score: { $lt: 85 } }
+)

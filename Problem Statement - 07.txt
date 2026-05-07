@@ -1,0 +1,126 @@
+Problem Statement: - 07
+
+Write a Stored Procedure namely proc_Grade for the categorization of student.
+ If marks scored by students in examination is  <=1500 and marks>=990 then
+student will be placed in Distinction category
+ if marks scored are between 989 and 900 category is First Class,
+ if marks 899 and 825 category is Higher Second Class.
+Write a PL/SQL block for using procedure created with above requirement.
+
+1. Stud_Marks (Roll, Name, Total_marks)
+2. Result (Roll, Name, Class)
+
+Frame the separate problem statement for writing PL/SQL Stored Procedure and function,
+inline with above statement.
+
+
+CREATE TABLE Stud_Marks (
+    Roll NUMBER PRIMARY KEY,
+    Name VARCHAR2(50),
+    Total_Marks NUMBER
+);
+
+CREATE TABLE Result (
+    Roll NUMBER,
+    Name VARCHAR2(50),
+    Class VARCHAR2(30)
+);
+
+INSERT INTO Stud_Marks VALUES(1, 'Amit', 1200);
+INSERT INTO Stud_Marks VALUES(2, 'Sneha', 950);
+INSERT INTO Stud_Marks VALUES(3, 'Rahul', 850);
+INSERT INTO Stud_Marks VALUES(4, 'Priya', 700);
+
+CREATE OR REPLACE PROCEDURE proc_Grade
+IS
+
+    CURSOR c1 IS
+        SELECT Roll, Name, Total_Marks
+        FROM Stud_Marks;
+
+    v_roll Stud_Marks.Roll%TYPE;
+    v_name Stud_Marks.Name%TYPE;
+    v_marks Stud_Marks.Total_Marks%TYPE;
+    v_class VARCHAR2(30);
+
+BEGIN
+
+    OPEN c1;
+
+    LOOP
+        FETCH c1 INTO v_roll, v_name, v_marks;
+
+        EXIT WHEN c1%NOTFOUND;
+
+        IF v_marks >= 990 AND v_marks <= 1500 THEN
+            v_class := 'Distinction';
+
+        ELSIF v_marks BETWEEN 900 AND 989 THEN
+            v_class := 'First Class';
+
+        ELSIF v_marks BETWEEN 825 AND 899 THEN
+            v_class := 'Higher Second Class';
+
+        ELSE
+            v_class := 'Fail';
+        END IF;
+
+        INSERT INTO Result
+        VALUES(v_roll, v_name, v_class);
+
+    END LOOP;
+
+    CLOSE c1;
+
+    DBMS_OUTPUT.PUT_LINE('Records Inserted Successfully');
+
+END;
+/
+
+BEGIN
+    proc_Grade;
+END;
+/
+
+CREATE OR REPLACE FUNCTION func_Grade(
+    p_marks NUMBER
+)
+RETURN VARCHAR2
+IS
+    v_class VARCHAR2(30);
+
+BEGIN
+
+    IF p_marks >= 990 AND p_marks <= 1500 THEN
+        v_class := 'Distinction';
+
+    ELSIF p_marks BETWEEN 900 AND 989 THEN
+        v_class := 'First Class';
+
+    ELSIF p_marks BETWEEN 825 AND 899 THEN
+        v_class := 'Higher Second Class';
+
+    ELSE
+        v_class := 'Fail';
+    END IF;
+
+    RETURN v_class;
+
+END;
+/
+
+DECLARE
+    v_result VARCHAR2(30);
+
+BEGIN
+
+    v_result := func_Grade(950);
+
+    DBMS_OUTPUT.PUT_LINE('Student Class: ' || v_result);
+
+END;
+/
+
+SELECT * FROM Result;
+
+

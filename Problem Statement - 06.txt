@@ -1,0 +1,95 @@
+Problem Statement: - 06
+Cursors
+
+Design and implement a PL/SQL stored procedure named proc_Grade to categorize
+students based on their total marks obtained in the examination using a cursor.
+The database contains the following tables:
+1. Stud_Marks (Roll, Name, Total_Marks)
+2. Result (Roll, Name, Class) 
+
+The procedure should:
+1. Use an explicit cursor to fetch student details (Roll, Name, Total_Marks) from the
+Stud_Marks table.
+2. For each student record fetched through the cursor, categorize them according to the
+following rules:
+o Distinction: Total_Marks ≥ 990 and ≤ 1500
+o First Class: Total_Marks between 900 and 989
+o Higher Second Class: Total_Marks between 825 and 899
+3. Insert the Roll, Name, and corresponding Class into the Result table.
+Finally, execute the procedure using an appropriate PL/SQL anonymous block.
+
+
+
+CREATE TABLE Stud_Marks (
+    Roll NUMBER PRIMARY KEY,
+    Name VARCHAR2(50),
+    Total_Marks NUMBER
+);
+
+CREATE TABLE Result (
+    Roll NUMBER,
+    Name VARCHAR2(50),
+    Class VARCHAR2(30)
+);
+
+INSERT INTO Stud_Marks VALUES(1, 'Amit', 1200);
+INSERT INTO Stud_Marks VALUES(2, 'Sneha', 950);
+INSERT INTO Stud_Marks VALUES(3, 'Rahul', 850);
+INSERT INTO Stud_Marks VALUES(4, 'Priya', 780);
+
+CREATE OR REPLACE PROCEDURE proc_Grade
+IS
+
+    CURSOR c_student IS
+        SELECT Roll, Name, Total_Marks
+        FROM Stud_Marks;
+
+    v_roll Stud_Marks.Roll%TYPE;
+    v_name Stud_Marks.Name%TYPE;
+    v_marks Stud_Marks.Total_Marks%TYPE;
+    v_class VARCHAR2(30);
+
+BEGIN
+
+    OPEN c_student;
+
+    LOOP
+        FETCH c_student INTO v_roll, v_name, v_marks;
+
+        EXIT WHEN c_student%NOTFOUND;
+
+        -- Grade Classification
+        IF v_marks >= 990 AND v_marks <= 1500 THEN
+            v_class := 'Distinction';
+
+        ELSIF v_marks BETWEEN 900 AND 989 THEN
+            v_class := 'First Class';
+
+        ELSIF v_marks BETWEEN 825 AND 899 THEN
+            v_class := 'Higher Second Class';
+
+        ELSE
+            v_class := 'Fail';
+        END IF;
+
+        -- Insert into Result table
+        INSERT INTO Result
+        VALUES(v_roll, v_name, v_class);
+
+    END LOOP;
+
+    CLOSE c_student;
+
+    DBMS_OUTPUT.PUT_LINE('Records Inserted Successfully');
+
+END;
+/
+
+BEGIN
+    proc_Grade;
+END;
+/
+
+SELECT * FROM Result;
+
+

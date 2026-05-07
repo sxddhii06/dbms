@@ -1,0 +1,173 @@
+Problem Statement: - 02
+
+Design at least 10 SQL queries for suitable database application using SQL DML
+statements: Insert, Select, Update, Delete with operators, functions, and set operator. 
+
+CREATE TABLE Department (
+    Deptno    NUMBER(5) PRIMARY KEY,
+    Dname     VARCHAR2(30) NOT NULL,
+    Location  VARCHAR2(30) NOT NULL
+);
+
+INSERT INTO Department VALUES (10, 'Accounting', 'Mumbai');
+INSERT INTO Department VALUES (20, 'Research', 'Pune');
+INSERT INTO Department VALUES (30, 'Sales', 'Nashik');
+INSERT INTO Department VALUES (40, 'Operations', 'Nagpur');
+
+COMMIT;
+
+INSERT INTO Employee
+VALUES(&Empno, '&Ename', '&Job', &Mgr,
+TO_DATE('&Joined_date','DD-MON-YY'),
+&Salary, &Commission, &Deptno, '&Address');
+
+Empno        : 1001
+Ename        : Nilesh joshi
+Job          : Clerk
+Mgr          : 1005
+Joined_date  : 17-DEC-95
+Salary       : 2800
+Commission   : 600
+Deptno       : 20
+Address      : Nashik
+
+Empno        : 1002
+Ename        : Avinash pawar
+Job          : Salesman
+Mgr          : 1003
+Joined_date  : 20-FEB-96
+Salary       : 5000
+Commission   : 1200
+Deptno       : 30
+Address      : Nagpur
+
+Empno        : 1003
+Ename        : Amit kumar
+Job          : Manager
+Mgr          : 1004
+Joined_date  : 02-APR-86
+Salary       : 2000
+Commission   : NULL
+Deptno       : 30
+Address      : Pune
+
+Empno        : 1004
+Ename        : Nitin kulkarni
+Job          : President
+Mgr          : NULL
+Joined_date  : 19-APR-86
+Salary       : 50000
+Commission   : NULL
+Deptno       : 10
+Address      : Mumbai
+
+Empno        : 1005
+Ename        : Niraj Sharma
+Job          : Analyst
+Mgr          : 1003
+Joined_date  : 03-DEC-98
+Salary       : 12000
+Commission   : NULL
+Deptno       : 20
+Address      : Satara
+
+Empno        : 1006
+Ename        : Pushkar deshpande
+Job          : Salesman
+Mgr          : 1003
+Joined_date  : 01-SEP-96
+Salary       : 6500
+Commission   : 1500
+Deptno       : 30
+Address      : Pune
+
+Empno        : 1007
+Ename        : Sumit patil
+Job          : Manager
+Mgr          : 1004
+Joined_date  : 01-MAY-91
+Salary       : 25000
+Commission   : NULL
+Deptno       : 20
+Address      : Mumbai
+
+Empno        : 1008
+Ename        : Ravi sawant
+Job          : Analyst
+Mgr          : 1007
+Joined_date  : 17-NOV-95
+Salary       : 10000
+Commission   : NULL
+Deptno       : NULL
+Address      : Amaravati
+
+1) Display employee information
+
+SELECT Empno, Ename, Job, Mgr, Joined_date,
+       Salary, Commission, Deptno, Address
+FROM Employee;
+
+2) Display unique jobs
+
+SELECT DISTINCT Job
+FROM Employee;
+
+3) Change location of dept 40 to Bangalore
+
+UPDATE Department
+SET Location = 'Bangalore'
+WHERE Deptno = 40;
+
+4) Change employee 1003 name to Nikhil Gosavi
+
+UPDATE Employee
+SET Ename = 'Nikhil Gosavi'
+WHERE Empno = 1003;
+
+5) Delete Pushkar Deshpande from employee table
+
+DELETE FROM Employee
+WHERE Ename = 'Pushkar Deshpande';
+
+6) Display employees whose job is Manager or Analyst
+---Using OR operator---
+
+SELECT *
+FROM Employee
+WHERE Job = 'Manager'
+   OR Job = 'Analyst';
+
+---Using IN operator---
+
+SELECT *
+FROM Employee
+WHERE Job IN ('Manager', 'Analyst');
+
+7) Display employee name and department number
+of employees in dept 10,20,30,40
+
+SELECT Ename, Deptno
+FROM Employee
+WHERE Deptno IN (10,20,30,40);
+
+8) Find names and joined date of employees
+whose names start with 'A'
+
+SELECT Ename, Joined_date
+FROM Employee
+WHERE Ename LIKE 'A%';
+
+9) Find employee names having 'i'
+as second letter
+
+SELECT Ename
+FROM Employee
+WHERE Ename LIKE '_i%';
+
+10) Find department number and maximum salary
+where maximum salary is greater than 5000
+
+SELECT Deptno, MAX(Salary) AS Maximum_Salary
+FROM Employee
+GROUP BY Deptno
+HAVING MAX(Salary) > 5000;

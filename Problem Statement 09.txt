@@ -1,0 +1,100 @@
+Problem Statement 09 — MongoDB CRUD Operations
+
+1. Create database Employee.
+
+use Employee
+
+2. Create collection emp1 using createCollection method.
+
+db.createCollection("emp1")
+
+3. Insert 4 to 5 documents in emp1 collection.(eno,ename,address,sal)
+
+db.emp1.insertMany([
+{
+    eno: 101,
+    ename: "Nilesh",
+    address: "Pune",
+    sal: 12000
+},
+{
+    eno: 102,
+    ename: "Neha",
+    address: "Mumbai",
+    sal: 18000
+},
+{
+    eno: 103,
+    ename: "Amit",
+    address: "Nashik",
+    sal: 4000
+},
+{
+    eno: 104,
+    ename: "Riya",
+    address: "Nagpur",
+    sal: 9000
+},
+{
+    eno: 105,
+    ename: "Nitin",
+    address: "Satara",
+    sal: 22000
+}
+])
+
+4. display all documents.
+
+db.emp1.find()
+
+5. Insert document by creating own object id.
+
+db.emp1.insertOne({
+    _id: ObjectId("661111111111111111111111"),
+    eno: 106,
+    ename: "Naina",
+    address: "Pune",
+    sal: 15000
+})
+
+6. Display all employess having salary greater than 5000
+
+db.emp1.find({ sal: { $gt: 5000 } })
+
+7. Display all employess having salary less than 15000
+
+db.emp1.find({ sal: { $lt: 15000 } })
+
+8. Display all employess having salary greater than 10000 and less than 20000.
+
+db.emp1.find({
+    $and: [
+        { sal: { $gt: 10000 } },
+        { sal: { $lt: 20000 } }
+    ]
+})
+
+9. update sal of all employee with 10%
+
+db.emp1.updateMany(
+    {},
+    { $mul: { sal: 1.10 } }
+)
+
+10.Delete employee having salary less than 5000.
+
+db.emp1.deleteMany({ sal: { $lt: 5000 } })
+
+11.Rename collection emp1 with employee1.
+
+db.emp1.renameCollection("employee1")
+
+12.Display employee whose name start with n.
+
+db.employee1.find({
+    ename: /^n/i
+})
+
+13.sort name in ascending order.
+
+db.employee1.find().sort({ ename: 1 })

@@ -1,0 +1,78 @@
+Problem Statement: - 12
+Design and Implement 10 query using MongoDB
+
+use School
+db.students.insertMany([
+ { student_id: 1, name: "Alice", age: 21, gender: "Female",
+ marks: { math: 95, science: 88, english: 82 } },
+ { student_id: 2, name: "Bob", age: 19, gender: "Male",
+ marks: { math: 65, science: 70, english: 85 } },
+ { student_id: 3, name: "Carol", age: 22, gender: "Female",
+ marks: { math: 78, science: 92, english: 88 } },
+ { student_id: 4, name: "Dave", age: 20, gender: "Male",
+ marks: { math: 91, science: 85, english: 79 } },
+ { student_id: 5, name: "Eva", age: 18, gender: "Female",
+ marks: { math: 55, science: 60, english: 72 } }
+])
+
+1. Find all students who are male.
+
+db.students.find({ gender: "Male" })
+
+2. Find students who scored more than 90 in math.
+
+db.students.find({ "marks.math": { $gt: 90 } })
+
+3. Find students aged 20 and above.
+
+db.students.find({ age: { $gte: 20 } })
+
+4. Find students whose English marks are between 80 and 90.
+
+db.students.find({
+  "marks.english": { $gte: 80, $lte: 90 }
+})
+
+5. Count the number of female students.
+
+db.students.countDocuments({ gender: "Female" })
+
+6. Find the student with the highest science score.
+
+db.students.find()
+.sort({ "marks.science": -1 })
+.limit(1)
+
+7. Update Bob’s math score to 75.
+
+db.students.updateOne(
+  { name: "Bob" },
+  { $set: { "marks.math": 75 } }
+)
+
+8. Delete all students who scored below 70 in math.
+
+db.students.deleteMany({
+  "marks.math": { $lt: 70 }
+})
+
+9. Use aggregation to find the average marks in science for all students.
+
+db.students.aggregate([
+  {
+    $group: {
+      _id: null,
+      averageScienceMarks: { $avg: "$marks.science" }
+    }
+  }
+])
+
+10.Find the number of students with marks greater than 80 in any subject.
+
+db.students.countDocuments({
+  $or: [
+    { "marks.math": { $gt: 80 } },
+    { "marks.science": { $gt: 80 } },
+    { "marks.english": { $gt: 80 } }
+  ]
+})

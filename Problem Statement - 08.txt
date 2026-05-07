@@ -1,0 +1,98 @@
+Problem Statement: - 08
+Database Trigger
+
+- Write a database trigger on Library table.
+- The System should keep track of the records that are being updated or deleted.
+- The old value of updated or deleted records should be added in Library_ Audit table.
+
+Frame the problem statement for writing Database Triggers of all types, in-line with above statement.
+
+ CREATE TABLE Library (
+    Book_ID NUMBER PRIMARY KEY,
+    Book_Name VARCHAR2(50),
+    Author VARCHAR2(50),
+    Price NUMBER
+);
+
+CREATE TABLE Library_Audit (
+    Book_ID NUMBER,
+    Book_Name VARCHAR2(50),
+    Author VARCHAR2(50),
+    Price NUMBER,
+    Operation VARCHAR2(20),
+    Action_Date DATE
+);
+
+INSERT INTO Library
+VALUES(101, 'DBMS', 'Korth', 500);
+
+INSERT INTO Library
+VALUES(102, 'Python', 'Mark Lutz', 650);
+
+CREATE OR REPLACE TRIGGER trg_before_update
+BEFORE UPDATE
+ON Library
+FOR EACH ROW
+
+BEGIN
+
+    INSERT INTO Library_Audit
+    VALUES(
+        :OLD.Book_ID,
+        :OLD.Book_Name,
+        :OLD.Author,
+        :OLD.Price,
+        'UPDATE',
+        SYSDATE
+    );
+
+END;
+/
+
+CREATE OR REPLACE TRIGGER trg_before_delete
+BEFORE DELETE
+ON Library
+FOR EACH ROW
+
+BEGIN
+
+    INSERT INTO Library_Audit
+    VALUES(
+        :OLD.Book_ID,
+        :OLD.Book_Name,
+        :OLD.Author,
+        :OLD.Price,
+        'DELETE',
+        SYSDATE
+    );
+
+END;
+/
+
+CREATE OR REPLACE TRIGGER trg_after_update
+AFTER UPDATE
+ON Library
+
+BEGIN
+    DBMS_OUTPUT.PUT_LINE('Library table updated successfully');
+END;
+/
+
+CREATE OR REPLACE TRIGGER trg_after_delete
+AFTER DELETE
+ON Library
+
+BEGIN
+    DBMS_OUTPUT.PUT_LINE('Record deleted from Library table');
+END;
+/
+
+UPDATE Library
+SET Price = 700
+WHERE Book_ID = 101;
+
+DELETE FROM Library
+WHERE Book_ID = 102;
+
+SELECT * FROM Library_Audit;
+

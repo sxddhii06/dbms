@@ -1,0 +1,98 @@
+Problem Statement 5
+Unnamed PL/SQL code block: Use of Control structure.
+Write a PL/SQL block of code for the following requirements:-
+Schema:
+1. Borrower(Rollin, Name, DateofIssue, NameofBook, Status)
+2. Fine(Roll_no,Date,Amt)
+
+
+CREATE TABLE Borrower (
+    Rollin NUMBER PRIMARY KEY,
+    Name VARCHAR2(50),
+    DateofIssue DATE,
+    NameofBook VARCHAR2(50),
+    Status CHAR(1)
+);
+
+CREATE TABLE Fine (
+    Roll_no NUMBER,
+    Date1 DATE,
+    Amt NUMBER
+);
+
+INSERT INTO Borrower
+VALUES(1, 'Amit', TO_DATE('2026-04-01','YYYY-MM-DD'),
+       'DBMS', 'I');
+
+INSERT INTO Borrower
+VALUES(2, 'Sneha', TO_DATE('2026-03-20','YYYY-MM-DD'),
+       'Python', 'I');
+
+DECLARE
+    v_rollno Borrower.Rollin%TYPE;
+    v_book Borrower.NameofBook%TYPE;
+    v_date Borrower.DateofIssue%TYPE;
+    v_days NUMBER;
+    v_fine NUMBER := 0;
+
+BEGIN
+    -- Accept input
+    v_rollno := &Roll_No;
+    v_book := '&Book_Name';
+
+    -- Fetch issue date
+    SELECT DateofIssue
+    INTO v_date
+    FROM Borrower
+    WHERE Rollin = v_rollno
+    AND NameofBook = v_book;
+
+    -- Calculate days
+    v_days := SYSDATE - v_date;
+
+    -- Fine calculation using control structure
+    IF v_days BETWEEN 15 AND 30 THEN
+        v_fine := v_days * 5;
+
+    ELSIF v_days > 30 THEN
+        v_fine := v_days * 50;
+
+    ELSE
+        v_fine := 0;
+    END IF;
+
+    -- Insert fine details if fine applicable
+    IF v_fine > 0 THEN
+        INSERT INTO Fine
+        VALUES(v_rollno, SYSDATE, v_fine);
+    END IF;
+
+    -- Update borrower status
+    UPDATE Borrower
+    SET Status = 'R'
+    WHERE Rollin = v_rollno
+    AND NameofBook = v_book;
+
+    DBMS_OUTPUT.PUT_LINE('Book Returned Successfully');
+    DBMS_OUTPUT.PUT_LINE('Total Fine = Rs. ' || v_fine);
+
+EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+        DBMS_OUTPUT.PUT_LINE('Record Not Found');
+
+    WHEN OTHERS THEN
+        DBMS_OUTPUT.PUT_LINE('Error Occurred');
+
+END;
+/
+
+
+
+----output examplee----
+
+Enter value for Roll_No: 1
+Enter value for Book_Name: DBMS
+
+Book Returned Successfully
+Total Fine = Rs. 180
+

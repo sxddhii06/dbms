@@ -1,0 +1,170 @@
+Problem Statement: - 03
+Design at least 10 SQL queries for suitable database application using SQL DML statements: using
+Join
+
+Design the employee database with all constraints. Construct the following SQL queries for this
+relational database.
+Employee(employee_name,street,city)
+Works(employee_name,company_name,salary)
+Company(company_name,city)
+Manages(employee_name,manager_name)
+
+
+CREATE TABLE Employee (
+    employee_name VARCHAR(50) PRIMARY KEY,
+    street VARCHAR(100) NOT NULL,
+    city VARCHAR(50) NOT NULL
+);
+
+CREATE TABLE Company (
+    company_name VARCHAR(50) PRIMARY KEY,
+    city VARCHAR(50) NOT NULL
+);
+
+CREATE TABLE Works (
+    employee_name VARCHAR(50),
+    company_name VARCHAR(50),
+    salary NUMBER(10,2) NOT NULL CHECK (salary > 0),
+
+    PRIMARY KEY (employee_name, company_name),
+
+    FOREIGN KEY (employee_name)
+        REFERENCES Employee(employee_name),
+
+    FOREIGN KEY (company_name)
+        REFERENCES Company(company_name)
+);
+
+CREATE TABLE Manages (
+    employee_name VARCHAR(50) PRIMARY KEY,
+    manager_name VARCHAR(50) NOT NULL,
+
+    FOREIGN KEY (employee_name)
+        REFERENCES Employee(employee_name),
+
+    FOREIGN KEY (manager_name)
+        REFERENCES Employee(employee_name)
+);
+
+
+INSERT INTO Employee VALUES ('Amit', 'MG Road', 'Pune');
+INSERT INTO Employee VALUES ('Sneha', 'FC Road', 'Mumbai');
+INSERT INTO Employee VALUES ('Rahul', 'Park Street', 'Delhi');
+INSERT INTO Employee VALUES ('Neha', 'Ring Road', 'Gotham');
+INSERT INTO Employee VALUES ('Ravi', 'JM Road', 'Pune');
+
+INSERT INTO Company VALUES ('First Bank Corporation', 'Mumbai');
+INSERT INTO Company VALUES ('Small Bank Corporation', 'Delhi');
+INSERT INTO Company VALUES ('ABC Pvt Ltd', 'Gotham');
+
+INSERT INTO Works VALUES ('Amit', 'First Bank Corporation', 15000);
+INSERT INTO Works VALUES ('Sneha', 'First Bank Corporation', 12000);
+INSERT INTO Works VALUES ('Rahul', 'Small Bank Corporation', 8000);
+INSERT INTO Works VALUES ('Neha', 'ABC Pvt Ltd', 7000);
+INSERT INTO Works VALUES ('Ravi', 'First Bank Corporation', 20000);
+
+INSERT INTO Manages VALUES ('Amit', 'Sneha');
+INSERT INTO Manages VALUES ('Rahul', 'Sneha');
+INSERT INTO Manages VALUES ('Neha', 'Rahul');
+
+1. Find the names of employees who work for First Bank Coorporation.
+
+SELECT e.employee_name
+FROM Employee e
+JOIN Works w
+ON e.employee_name = w.employee_name
+WHERE w.company_name = 'First Bank Corporation';
+
+2. . Find the names and cities of residence of all employees who work for First Bank Coorporation
+
+SELECT e.employee_name, e.city
+FROM Employee e
+JOIN Works w
+ON e.employee_name = w.employee_name
+WHERE w.company_name = 'First Bank Corporation';
+
+3. Find the names, street addresses, and cities of residence of all employees who work for First Bank Coorporation and earn more than $10000.
+
+SELECT e.employee_name, e.street, e.city
+FROM Employee e
+JOIN Works w
+ON e.employee_name = w.employee_name
+WHERE w.company_name = 'First Bank Corporation'
+AND w.salary > 10000;
+
+4. Find all employees in the database who earn more than each employee of Small Bank Coorporation
+
+SELECT employee_name
+FROM Works
+WHERE salary > ALL (
+    SELECT salary
+    FROM Works
+    WHERE company_name = 'Small Bank Corporation'
+);
+
+5. Find all employees who earn more than the average salary of all employees of their companies.
+
+SELECT w1.employee_name, w1.salary, w1.company_name
+FROM Works w1
+WHERE w1.salary >
+(
+    SELECT AVG(w2.salary)
+    FROM Works w2
+    WHERE w1.company_name = w2.company_name
+);
+
+6. Find the company that has the smallest payroll.
+
+SELECT company_name
+FROM Works
+GROUP BY company_name
+HAVING SUM(salary) <= ALL (
+    SELECT SUM(salary)
+    FROM Works
+    GROUP BY company_name
+);
+
+7. Find those companies whose employees earn a higher salary, on average, than the average salary at First Bank Coorporation.
+
+SELECT company_name
+FROM Works
+GROUP BY company_name
+HAVING AVG(salary) >
+(
+    SELECT AVG(salary)
+    FROM Works
+    WHERE company_name = 'First Bank Corporation'
+);
+
+8. Give all employees of First Bank Coorporation” a 10% raise
+
+UPDATE Works
+SET salary = salary + (salary * 0.10)
+WHERE company_name = 'First Bank Corporation';
+
+9. Insert the names and salaries of employees who earn more than the average salary into a new table called HighEarners
+
+CREATE TABLE HighEarners (
+    employee_name VARCHAR(50),
+    salary NUMBER(10,2)
+);
+
+INSERT INTO HighEarners (employee_name, salary)
+SELECT employee_name, salary
+FROM Works
+WHERE salary >
+(
+    SELECT AVG(salary)
+    FROM Works
+);
+
+10. Delete employees from the Employee table who work for a company in the Company table that is located in Gotham.
+
+DELETE FROM Employee
+WHERE employee_name IN (
+    SELECT w.employee_name
+    FROM Works w
+    JOIN Company c
+    ON w.company_name = c.company_name
+    WHERE c.city = 'Gotham'
+);
